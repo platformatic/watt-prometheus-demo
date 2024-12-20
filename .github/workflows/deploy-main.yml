@@ -1,0 +1,43 @@
+name: Deploy an application to the main taxonomy in the ICC
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  # Put the ICC URL here
+  ICC_URL: https://icc.plt
+  API_KEY: ${{ secrets.PLT_API_KEY }}
+  # Put your application name here
+  APPLICATION_NAME: demo
+
+jobs:
+  deploy-app-to-icc:
+    permissions:
+      contents: read
+      pull-requests: read
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install the tug
+        run: |
+          curl -o tug https://downloads.platformatichq.com/tug-linux-v1
+          chmod +x tug
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Deploy to the main taxonomy in the ICC
+        run: ./tug apps deploy -a $APPLICATION_NAME --api-key $API_KEY --ci=github --reject-unauthorized=false --icc-url=$ICC_URL
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

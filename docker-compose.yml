@@ -1,0 +1,19 @@
+services:
+  watt:
+    image: prometheus-demo
+    build: .
+    ports:
+      - "3042:3042"
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - prometheus_data:/prometheus
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - "9090:9090"
+
+volumes:
+  prometheus_data: {}
